@@ -4,7 +4,7 @@ import urllib.parse
 import http.client
 from PIL import Image
 
-SIZE_TITLE = 2236
+SIZE_TILE = 2236
 
 
 
@@ -42,12 +42,12 @@ class Gallica():
                 self.create_image(res, x, y)
                 status_y = 200
                 while status_y == 200:
-                    y += SIZE_TITLE
+                    y += SIZE_TILE
                     res = self.request(x, y)
                     status_y = res.status
                     if status_y == 200:
                         self.create_image(res, x, y)
-            x += SIZE_TITLE
+            x += SIZE_TILE
         self.compose()
 
 
@@ -95,7 +95,7 @@ class Gallica():
         gallica = "gallica.bnf.fr"
         url = "/proxy"
         headers = {"Content-type": "application/x-www-form-urlencoded", "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"}
-        full_url = url + '?' + url_values + "&r=" + "{0},{1},{2},{2}".format(x, y, SIZE_TITLE)
+        full_url = url + '?' + url_values + "&r=" + "{0},{1},{2},{2}".format(x, y, SIZE_TILE)
         conn = http.client.HTTPConnection(gallica)
         conn.request("GET", full_url, "", headers)
         res = conn.getresponse()
