@@ -15,7 +15,6 @@ class Gallica():
         self.x = 0
         self.y = 0
         self.id = id + ".f1"
-        self.image = Image.new("RGB", (10000, 10000))
         self.out = out
 
 
@@ -25,7 +24,7 @@ class Gallica():
             id = url.path.split("/")[3].split(".")[0]
         except:
             print("Mauvaise Url")
-            exit(0)
+            sys.exit(2)
         return id
 
 
