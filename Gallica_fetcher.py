@@ -1,5 +1,8 @@
 #! /bin/python
-import os, sys, getopt, shutil
+import os
+import sys
+import getopt
+import shutil
 import urllib.parse
 import http.client
 from PIL import Image
@@ -7,16 +10,13 @@ from PIL import Image
 SIZE_TILE = 2236
 
 
-
 class Gallica():
-
 
     def __init__(self, id, out):
         self.x = 0
         self.y = 0
         self.id = id + ".f1"
         self.out = out
-
 
     def parse_url(url):
         url = urllib.parse.urlparse(url)
@@ -27,9 +27,8 @@ class Gallica():
             sys.exit(2)
         return id
 
-
     def fetch(self):
-        x = 0        
+        x = 0
         status_x = 200
         nb_row = 0
         while status_x == 200:
@@ -49,7 +48,6 @@ class Gallica():
             x += SIZE_TILE
         self.compose()
 
-
     def create_image(self, res, x, y):
         path = "tmp/"
         if not os.path.exists(path):
@@ -58,7 +56,6 @@ class Gallica():
         f = open(filename, 'wb')
         f.write(res.read())
         f.close()
-
 
     def compose(self):
         imageList = sorted(os.listdir("tmp/"))
@@ -78,12 +75,11 @@ class Gallica():
             pos = img.split("_")
             paste = Image.open("tmp/" + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
-        
+
         image.save(self.out)
 
         # Delete temp
         shutil.rmtree('tmp/')
-
 
     def request(self, x, y):
         data = {}
@@ -93,8 +89,10 @@ class Gallica():
         url_values = urllib.parse.urlencode(data)
         gallica = "gallica.bnf.fr"
         url = "/proxy"
-        headers = {"Content-type": "application/x-www-form-urlencoded", "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"}
-        full_url = url + '?' + url_values + "&r=" + "{0},{1},{2},{2}".format(x, y, SIZE_TILE)
+        headers = {"Content-type": "application/x-www-form-urlencoded", "User-Agent":
+                   "Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"}
+        full_url = url + '?' + url_values + "&r=" + \
+            "{0},{1},{2},{2}".format(x, y, SIZE_TILE)
         conn = http.client.HTTPConnection(gallica)
         conn.request("GET", full_url, "", headers)
         res = conn.getresponse()
@@ -109,7 +107,7 @@ if __name__ == "__main__":
     url = ''
     outputfile = "out.jpg"
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"hu:o:",["url=","ofile="])
+        opts, args = getopt.getopt(sys.argv[1:], "hu:o:", ["url=", "ofile="])
     except getopt.GetoptError as err:
         print(err)
         usage()
