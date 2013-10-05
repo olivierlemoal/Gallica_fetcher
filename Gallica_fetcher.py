@@ -103,7 +103,7 @@ class Gallica():
 
 
 def usage():
-    print("BNF_fetcher.py -u <url> [-o <outputfile>]")
+    print("Gallica.py -u <url> [-o <outputfile>]")
 
 
 if __name__ == "__main__":
