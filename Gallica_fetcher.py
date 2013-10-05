@@ -30,13 +30,11 @@ class Gallica():
     def fetch(self):
         x = 0
         status_x = 200
-        nb_row = 0
         while status_x == 200:
             y = 0
             res = self.request(x, y)
             status_x = res.status
             if status_x == 200:
-                nb_row += 1
                 self.create_image(res, x, y)
                 status_y = 200
                 while status_y == 200:
