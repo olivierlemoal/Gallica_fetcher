@@ -28,7 +28,7 @@ class Gallica():
         return id
 
     def fetch(self):
-        sys.stdout.write("Downloading")
+        sys.stdout.write("Téléchargement")
         sys.stdout.flush()
         x = 0
         status_x = 200
@@ -61,7 +61,7 @@ class Gallica():
         f.close()
 
     def compose(self):
-        print("Merging images...")
+        print("Fusion des images...")
         imageList = sorted(os.listdir("tmp/"))
         totalWidth = 0
         totalHeigth = 0
@@ -81,6 +81,7 @@ class Gallica():
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
         image.save(self.out)
+        print("Image sauvegardée")
 
         # Delete temp
         shutil.rmtree('tmp/')
