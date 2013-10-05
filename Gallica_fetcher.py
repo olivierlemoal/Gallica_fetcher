@@ -28,6 +28,8 @@ class Gallica():
         return id
 
     def fetch(self):
+        sys.stdout.write("Downloading")
+        sys.stdout.flush()
         x = 0
         status_x = 200
         while status_x == 200:
@@ -44,9 +46,12 @@ class Gallica():
                     if status_y == 200:
                         self.create_image(res, x, y)
             x += SIZE_TILE
+        sys.stdout.write("\n")
         self.compose()
 
     def create_image(self, res, x, y):
+        sys.stdout.write(".")
+        sys.stdout.flush()
         path = "tmp/"
         if not os.path.exists(path):
             os.mkdir(path)
@@ -56,6 +61,7 @@ class Gallica():
         f.close()
 
     def compose(self):
+        print("Merging images...")
         imageList = sorted(os.listdir("tmp/"))
         totalWidth = 0
         totalHeigth = 0
@@ -101,7 +107,7 @@ def usage():
     print("Gallica_fetcher.py -u <url> [-o <outputfile>]")
 
 
-if __name__ == "__main__":
+def main():
     url = ''
     outputfile = "out.jpg"
     try:
@@ -125,3 +131,7 @@ if __name__ == "__main__":
     id = Gallica.parse_url(url)
     gallica = Gallica(id, out=outputfile)
     gallica.fetch()
+
+
+if __name__ == "__main__":
+    main()
