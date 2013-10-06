@@ -108,7 +108,7 @@ class Gallica():
 
 
 def usage():
-    print("Gallica_fetcher.py -u <url> [-o <outputfile>]")
+    print("gallica_fetcher.py -u <url> [-o <outputfile>]")
 
 
 def main():
