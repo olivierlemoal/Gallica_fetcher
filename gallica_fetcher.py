@@ -8,11 +8,11 @@ import http.client
 import tempfile
 from PIL import Image
 
-SIZE_TILE = 2236
-TEMP = tempfile.mkdtemp() + "/"
-
 
 class Gallica():
+
+    SIZE_TILE = 2236
+    TEMP = tempfile.mkdtemp() + "/"
 
     def __init__(self, id, out):
         self.x = 0
@@ -44,19 +44,19 @@ class Gallica():
                 self.create_image(res, x, y)
                 status_y = 200
                 while status_y == 200:
-                    y += SIZE_TILE
+                    y += self.SIZE_TILE
                     res = self.request(x, y)
                     status_y = res.status
                     if status_y == 200:
                         self.create_image(res, x, y)
-            x += SIZE_TILE
+            x += self.SIZE_TILE
         sys.stdout.write("\n")
         self.compose()
 
     def create_image(self, res, x, y):
         sys.stdout.write(".")
         sys.stdout.flush()
-        path = TEMP
+        path = self.TEMP
         if not os.path.exists(path):
             os.mkdir(path)
         filename = path + "{0}_{1}_.jpg".format(x, y)
@@ -66,12 +66,12 @@ class Gallica():
 
     def compose(self):
         print("Composition de l'image...")
-        imageList = sorted(os.listdir(TEMP))
+        imageList = sorted(os.listdir(self.TEMP))
         totalWidth = 0
         totalHeigth = 0
         for img in imageList:
             pos = img.split("_")
-            img = Image.open(TEMP + img)
+            img = Image.open(self.TEMP + img)
             [x, y] = img.size
             if int(pos[0]) == 0:
                 totalWidth += x
@@ -81,14 +81,14 @@ class Gallica():
         image = Image.new("RGB", (totalWidth, totalHeigth))
         for img in imageList:
             pos = img.split("_")
-            paste = Image.open(TEMP + img)
+            paste = Image.open(self.TEMP + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
         image.save(self.out)
         print("Image sauvegardée")
 
         # Delete temp
-        shutil.rmtree(TEMP)
+        shutil.rmtree(self.TEMP)
 
     def request(self, x, y):
         data = {}
@@ -101,7 +101,7 @@ class Gallica():
         headers = {"Content-type": "application/x-www-form-urlencoded", "User-Agent":
                    "Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"}
         full_url = url + '?' + url_values + "&r=" + \
-            "{0},{1},{2},{2}".format(x, y, SIZE_TILE)
+            "{0},{1},{2},{2}".format(x, y, self.SIZE_TILE)
         conn = http.client.HTTPConnection(gallica)
         conn.request("GET", full_url, "", headers)
         res = conn.getresponse()
