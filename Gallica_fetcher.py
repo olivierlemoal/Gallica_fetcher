@@ -5,9 +5,11 @@ import getopt
 import shutil
 import urllib.parse
 import http.client
+import tempfile
 from PIL import Image
 
 SIZE_TILE = 2236
+TEMP = tempfile.mkdtemp()
 
 
 class Gallica():
@@ -15,7 +17,8 @@ class Gallica():
     def __init__(self, id, out):
         self.x = 0
         self.y = 0
-        self.id = id + ".f1"
+        self.id = id
+        self.page = 1
         self.out = out
 
     def parse_url(url):
@@ -52,7 +55,7 @@ class Gallica():
     def create_image(self, res, x, y):
         sys.stdout.write(".")
         sys.stdout.flush()
-        path = "tmp/"
+        path = TEMP
         if not os.path.exists(path):
             os.mkdir(path)
         filename = path + "{0}_{1}_.jpg".format(x, y)
@@ -62,12 +65,12 @@ class Gallica():
 
     def compose(self):
         print("Fusion des images...")
-        imageList = sorted(os.listdir("tmp/"))
+        imageList = sorted(os.listdir(TEMP))
         totalWidth = 0
         totalHeigth = 0
         for img in imageList:
             pos = img.split("_")
-            img = Image.open("tmp/" + img)
+            img = Image.open(TEMP + img)
             [x, y] = img.size
             if int(pos[0]) == 0:
                 totalWidth += x
@@ -77,14 +80,14 @@ class Gallica():
         image = Image.new("RGB", (totalWidth, totalHeigth))
         for img in imageList:
             pos = img.split("_")
-            paste = Image.open("tmp/" + img)
+            paste = Image.open(TEMP + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
         image.save(self.out)
         print("Image sauvegardée")
 
         # Delete temp
-        shutil.rmtree('tmp/')
+        shutil.rmtree(TEMP)
 
     def request(self, x, y):
         data = {}
