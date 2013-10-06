@@ -9,7 +9,7 @@ import tempfile
 from PIL import Image
 
 SIZE_TILE = 2236
-TEMP = tempfile.mkdtemp()
+TEMP = tempfile.mkdtemp() + "/"
 
 
 class Gallica():
@@ -21,7 +21,8 @@ class Gallica():
         self.page = 1
         self.out = out
 
-    def parse_url(url):
+    @classmethod
+    def parse_url(cls, url):
         url = urllib.parse.urlparse(url)
         try:
             id = url.path.split("/")[3].split(".")[0]
@@ -64,7 +65,7 @@ class Gallica():
         f.close()
 
     def compose(self):
-        print("Fusion des images...")
+        print("Composition de l'image...")
         imageList = sorted(os.listdir(TEMP))
         totalWidth = 0
         totalHeigth = 0
@@ -92,7 +93,7 @@ class Gallica():
     def request(self, x, y):
         data = {}
         data['method'] = 'R'
-        data['ark'] = self.id
+        data['ark'] = "{0}.f{1}".format(self.id, self.page)
         data['l'] = 7
         url_values = urllib.parse.urlencode(data)
         gallica = "gallica.bnf.fr"
@@ -108,7 +109,7 @@ class Gallica():
 
 
 def usage():
-    print("gallica_fetcher.py -u <url> [-o <outputfile>]")
+    print("Gallica_fetcher.py -u <url> [-o <outputfile>]")
 
 
 def main():
