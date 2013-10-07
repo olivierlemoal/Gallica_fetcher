@@ -9,20 +9,27 @@ import tempfile
 from PIL import Image
 
 
-class Gallica():
+class PageException(Exception):
+
+    def __init__(self, value):
+        print(value)
+
+
+class Gallica:
 
     SIZE_TILE = 2236
     TEMP = tempfile.mkdtemp() + "/"
 
-    def __init__(self, id, out):
+    def __init__(self, id, out, pageMin, pageMax):
         self.x = 0
         self.y = 0
         self.id = id
-        self.page = 1
+        self.page = pageMin
+        self.pageMax = pageMax
         self.out = out
 
-    @classmethod
-    def parse_url(cls, url):
+    @staticmethod
+    def parse_url(url):
         url = urllib.parse.urlparse(url)
         try:
             id = url.path.split("/")[3].split(".")[0]
@@ -31,8 +38,13 @@ class Gallica():
             sys.exit(2)
         return id
 
+    def fetch_all(self):
+        while self.page <= self.pageMax:
+            self.fetch()
+            self.page += 1
+
     def fetch(self):
-        sys.stdout.write("Téléchargement")
+        sys.stdout.write("Téléchargement de la page {0}".format(self.page))
         sys.stdout.flush()
         x = 0
         status_x = 200
@@ -51,7 +63,10 @@ class Gallica():
                         self.create_image(res, x, y)
             x += self.SIZE_TILE
         sys.stdout.write("\n")
-        self.compose()
+        try:
+            self.compose()
+        except PageException:
+            sys.exit(2)
 
     def create_image(self, res, x, y):
         sys.stdout.write(".")
@@ -67,6 +82,8 @@ class Gallica():
     def compose(self):
         print("Composition de l'image...")
         imageList = sorted(os.listdir(self.TEMP))
+        if not imageList:
+            raise PageException("Page non existante")
         totalWidth = 0
         totalHeigth = 0
         for img in imageList:
@@ -84,8 +101,9 @@ class Gallica():
             paste = Image.open(self.TEMP + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
-        image.save(self.out)
-        print("Image sauvegardée")
+        saveName = "{0}_{1}.jpg".format(self.out, self.page)
+        image.save(saveName)
+        print("Image sauvegardée : {0}".format(saveName))
 
         # Delete temp
         shutil.rmtree(self.TEMP)
@@ -109,14 +127,21 @@ class Gallica():
 
 
 def usage():
-    print("Gallica_fetcher.py -u <url> [-o <outputfile>]")
+    print(
+        "gallica_fetcher.py -u <url> [-o <outputfile>] [-p <firstPage>[-<lastPage>]]")
+    print("Exemples :")
+    print("gallica_fetcher.py -u <url> -p 1-12 -o extrait")
+    print("gallica_fetcher.py -u <url> -p 13")
+    print("gallica_fetcher.py -u <url>")
 
 
 def main():
     url = ''
-    outputfile = "out.jpg"
+    outputfile = "gallica"
+    pageMin, pageMax = (1, 1)
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hu:o:", ["url=", "ofile="])
+        opts, args = getopt.getopt(
+            sys.argv[1:], "hu:o:p:", ["url=", "ofile=", "pages="])
     except getopt.GetoptError as err:
         print(err)
         usage()
@@ -129,13 +154,31 @@ def main():
             url = arg
         elif opt in ("-o", "--ofile"):
             outputfile = arg
+        elif opt in ("-p", "--pages"):
+            try:
+                if "-" in arg:
+                    pageMin, pageMax = arg.split("-")
+                    pageMin = int(pageMin)
+                    pageMax = int(pageMax)
+                else:
+                    pageMin = int(arg)
+                    pageMax = pageMin
+                if pageMax < pageMin:
+                    raise ValueError
+                if pageMin == 0:
+                    print("La numérotation des pages commence à 1")
+                    raise ValueError
+            except ValueError:
+                print("Syntaxe des pages invalide")
+                usage()
+                sys.exit(2)
     if url == '':
         print("URL manquante")
         usage()
         sys.exit(2)
     id = Gallica.parse_url(url)
-    gallica = Gallica(id, out=outputfile)
-    gallica.fetch()
+    gallica = Gallica(id, out=outputfile, pageMin=pageMin, pageMax=pageMax)
+    gallica.fetch_all()
 
 
 if __name__ == "__main__":
