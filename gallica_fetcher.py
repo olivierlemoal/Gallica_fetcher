@@ -172,7 +172,7 @@ def main():
                 print("Syntaxe des pages invalide")
                 usage()
                 sys.exit(2)
-    if url == '':
+    if not url:
         print("URL manquante")
         usage()
         sys.exit(2)
