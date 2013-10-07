@@ -27,19 +27,19 @@ class Gallica:
     SIZE_TILE = 2236
     TEMP = tempfile.mkdtemp() + "/"
 
-    def __init__(self, id, outputFilename, pageMin, pageMax):
+    def __init__(self, id, output_filename, page_min, page_max):
         """
             :param id: id of the object to fetch on the server
-            :param outputFilename: name of the resulting file without extension
-            :param pageMin: page where the fetching starts
-            :param pageMax: page where the fetching stops
+            :param output_filename: name of the resulting file without extension
+            :param page_min: page where the fetching starts
+            :param page_max: page where the fetching stops
         """
         self.x = 0
         self.y = 0
         self.id = id
-        self.page = pageMin
-        self.pageMax = pageMax
-        self.outputFilename = outputFilename
+        self.page = page_min
+        self.page_max = page_max
+        self.output_filename = output_filename
 
     @staticmethod
     def parse_url(url):
@@ -58,7 +58,7 @@ class Gallica:
         """
             Fetch all the pages requested by the user.
         """
-        while self.page <= self.pageMax:
+        while self.page <= self.page_max:
             self.fetch()
             self.page += 1
 
@@ -112,26 +112,26 @@ class Gallica:
         imageList = sorted(os.listdir(self.TEMP))
         if not imageList:
             raise PageException("The page doesn't exist")
-        totalWidth = 0
-        totalHeigth = 0
+        total_width = 0
+        total_heigth = 0
         for img in imageList:
             pos = img.split("_")
             img = Image.open(self.TEMP + img)
             [x, y] = img.size
             if int(pos[0]) == 0:
-                totalWidth += x
+                total_width += x
             if int(pos[1]) == 0:
-                totalHeigth += y
+                total_heigth += y
 
-        image = Image.new("RGB", (totalWidth, totalHeigth))
+        image = Image.new("RGB", (total_width, total_heigth))
         for img in imageList:
             pos = img.split("_")
             paste = Image.open(self.TEMP + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
-        saveName = "{0}_{1}.jpg".format(self.outputFilename, self.page)
-        image.save(saveName)
-        print("Picture saved : {0}".format(saveName))
+        save_name = "{0}_{1}.jpg".format(self.output_filename, self.page)
+        image.save(save_name)
+        print("Picture saved : {0}".format(save_name))
 
         # Delete temp
         shutil.rmtree(self.TEMP)
@@ -162,7 +162,7 @@ def usage():
         Print the usage on the stdout.
     """
     print(
-        "Usage : gallica_fetcher.py -u <url> [-o <outputFilename>] [-p <firstPage>[-<lastPage>]]")
+        "Usage : gallica_fetcher.py -u <url> [-o <output_filename>] [-p <firstPage>[-<lastPage>]]")
     print("Exemples :")
     print("gallica_fetcher.py -u <url> -p 1-12 -o extract")
     print("gallica_fetcher.py -u <url> -p 13")
@@ -174,8 +174,8 @@ def main():
         Parse arguments and start fetching.
     """
     url = ''
-    outputFilename = "gallica"
-    pageMin, pageMax = (1, 1)
+    output_filename = "gallica"
+    page_min, page_max = (1, 1)
     try:
         opts, args = getopt.getopt(
             sys.argv[1:], "hu:o:p:", ["url=", "ofile=", "pages="])
@@ -190,19 +190,19 @@ def main():
         elif opt in ("-u", "--url"):
             url = arg
         elif opt in ("-o", "--ofile"):
-            outputFilename = arg
+            output_filename = arg
         elif opt in ("-p", "--pages"):
             try:
                 if "-" in arg:
-                    pageMin, pageMax = arg.split("-")
-                    pageMin = int(pageMin)
-                    pageMax = int(pageMax)
+                    page_min, page_max = arg.split("-")
+                    page_min = int(page_min)
+                    page_max = int(page_max)
                 else:
-                    pageMin = int(arg)
-                    pageMax = pageMin
-                if pageMax < pageMin:
+                    page_min = int(arg)
+                    page_max = page_min
+                if page_max < page_min:
                     raise ValueError
-                if pageMin == 0:
+                if page_min == 0:
                     print("First page must be at least 1")
                     raise ValueError
             except ValueError:
@@ -214,7 +214,7 @@ def main():
         usage()
         sys.exit(2)
     id = Gallica.parse_url(url)
-    gallica = Gallica(id, outputFilename=outputFilename, pageMin=pageMin, pageMax=pageMax)
+    gallica = Gallica(id, output_filename=output_filename, page_min=page_min, page_max=page_max)
     gallica.fetch_all()
 
 
