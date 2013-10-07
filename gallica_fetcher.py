@@ -1,4 +1,5 @@
-#! /bin/python
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os
 import sys
 import getopt
@@ -10,41 +11,62 @@ from PIL import Image
 
 
 class PageException(Exception):
+    """
+        Exception used for non-existent pages
+    """
 
     def __init__(self, value):
         print(value)
 
 
 class Gallica:
+    """
+        A Gallica object (map, book...) identified by his id. The object can have multiple pages.
+    """
 
     SIZE_TILE = 2236
     TEMP = tempfile.mkdtemp() + "/"
 
-    def __init__(self, id, out, pageMin, pageMax):
+    def __init__(self, id, outputFilename, pageMin, pageMax):
+        """
+            :param id: id of the object to fetch on the server
+            :param outputFilename: name of the resulting file without extension
+            :param pageMin: page where the fetching starts
+            :param pageMax: page where the fetching stops
+        """
         self.x = 0
         self.y = 0
         self.id = id
         self.page = pageMin
         self.pageMax = pageMax
-        self.out = out
+        self.outputFilename = outputFilename
 
     @staticmethod
     def parse_url(url):
+        """
+            Parse the url provided with -u to extract the id of the object.
+        """
         url = urllib.parse.urlparse(url)
         try:
             id = url.path.split("/")[3].split(".")[0]
         except:
-            print("Mauvaise Url")
+            print("Invalid Url")
             sys.exit(2)
         return id
 
     def fetch_all(self):
+        """
+            Fetch all the pages requested by the user.
+        """
         while self.page <= self.pageMax:
             self.fetch()
             self.page += 1
 
     def fetch(self):
-        sys.stdout.write("Téléchargement de la page {0}".format(self.page))
+        """
+            Fetch the tiles for a page of the object.
+        """
+        sys.stdout.write("Downloading page {0}".format(self.page))
         sys.stdout.flush()
         x = 0
         status_x = 200
@@ -69,6 +91,9 @@ class Gallica:
             sys.exit(2)
 
     def create_image(self, res, x, y):
+        """
+            Save the tile in a temporary directory.
+        """
         sys.stdout.write(".")
         sys.stdout.flush()
         path = self.TEMP
@@ -80,10 +105,13 @@ class Gallica:
         f.close()
 
     def compose(self):
-        print("Composition de l'image...")
+        """
+            Assemble all the tiles together and save the final picture.
+        """
+        print("Assembling picture...")
         imageList = sorted(os.listdir(self.TEMP))
         if not imageList:
-            raise PageException("Page non existante")
+            raise PageException("The page doesn't exist")
         totalWidth = 0
         totalHeigth = 0
         for img in imageList:
@@ -101,14 +129,17 @@ class Gallica:
             paste = Image.open(self.TEMP + img)
             image.paste(paste, (int(pos[1]), int(pos[0])))
 
-        saveName = "{0}_{1}.jpg".format(self.out, self.page)
+        saveName = "{0}_{1}.jpg".format(self.outputFilename, self.page)
         image.save(saveName)
-        print("Image sauvegardée : {0}".format(saveName))
+        print("Picture saved : {0}".format(saveName))
 
         # Delete temp
         shutil.rmtree(self.TEMP)
 
     def request(self, x, y):
+        """
+            Create a request to get the tile on the Gallica server.
+        """
         data = {}
         data['method'] = 'R'
         data['ark'] = "{0}.f{1}".format(self.id, self.page)
@@ -127,17 +158,23 @@ class Gallica:
 
 
 def usage():
+    """
+        Print the usage on the stdout.
+    """
     print(
-        "gallica_fetcher.py -u <url> [-o <outputfile>] [-p <firstPage>[-<lastPage>]]")
+        "Usage : gallica_fetcher.py -u <url> [-o <outputFilename>] [-p <firstPage>[-<lastPage>]]")
     print("Exemples :")
-    print("gallica_fetcher.py -u <url> -p 1-12 -o extrait")
+    print("gallica_fetcher.py -u <url> -p 1-12 -o extract")
     print("gallica_fetcher.py -u <url> -p 13")
     print("gallica_fetcher.py -u <url>")
 
 
 def main():
+    """
+        Parse arguments and start fetching.
+    """
     url = ''
-    outputfile = "gallica"
+    outputFilename = "gallica"
     pageMin, pageMax = (1, 1)
     try:
         opts, args = getopt.getopt(
@@ -153,7 +190,7 @@ def main():
         elif opt in ("-u", "--url"):
             url = arg
         elif opt in ("-o", "--ofile"):
-            outputfile = arg
+            outputFilename = arg
         elif opt in ("-p", "--pages"):
             try:
                 if "-" in arg:
@@ -166,18 +203,18 @@ def main():
                 if pageMax < pageMin:
                     raise ValueError
                 if pageMin == 0:
-                    print("La numérotation des pages commence à 1")
+                    print("First page must be at least 1")
                     raise ValueError
             except ValueError:
-                print("Syntaxe des pages invalide")
+                print("Invalid page syntax")
                 usage()
                 sys.exit(2)
     if not url:
-        print("URL manquante")
+        print("Missing Url")
         usage()
         sys.exit(2)
     id = Gallica.parse_url(url)
-    gallica = Gallica(id, out=outputfile, pageMin=pageMin, pageMax=pageMax)
+    gallica = Gallica(id, outputFilename=outputFilename, pageMin=pageMin, pageMax=pageMax)
     gallica.fetch_all()
 
 
