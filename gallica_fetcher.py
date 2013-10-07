@@ -24,7 +24,7 @@ class Gallica:
         A Gallica object (map, book...) identified by his id. The object can have multiple pages.
     """
 
-    SIZE_TILE = 2236
+    SIZE_TILE = 2236  # max square tile size allowed to be requested by the server
     TEMP = tempfile.mkdtemp() + "/"
 
     def __init__(self, id, output_filename, page_min, page_max):
@@ -111,6 +111,7 @@ class Gallica:
         print("Assembling picture...")
         imageList = sorted(os.listdir(self.TEMP))
         if not imageList:
+            # If imageList is empty, no tiles were fetched so the page doesn't exist
             raise PageException("The page doesn't exist")
         total_width = 0
         total_heigth = 0
