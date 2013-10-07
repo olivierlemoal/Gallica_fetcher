@@ -32,7 +32,7 @@ Français
 
 Gallica_fetcher est un script python3 pour récupérer les versions haute définition des images numérisées de la 
 Bibliothèque nationale de France (sur la plateforme [Gallica](http://gallica.bnf.fr/)). En effet le site ne propose que des
-versions base définition en téléchargement.
+versions basse définition en téléchargement.
 
 Dépendance
 -----------
