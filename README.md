@@ -17,7 +17,7 @@ Installation
 Usage
 -----
 
-    gallica_fetcher.py -u <url> [-o <outputfile>]
+    gallica_fetcher.py -u <url> [-o <outputfile>] [-p <firstPage>[-<lastPage>]]
     
 The url you must provide is the one you get when you select a result from a search, for instance :
 
@@ -49,7 +49,7 @@ Installation
 Utilisation
 -----------
 
-    gallica_fetcher.py -u <url> [-o <outputfile>]
+    gallica_fetcher.py -u <url> [-o <outputfile>] [-p <firstPage>[-<lastPage>]]
     
 Le lien à fournir est celui d'un résultat lors d'une recherche, par exemple:
 
