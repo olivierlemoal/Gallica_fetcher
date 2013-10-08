@@ -163,7 +163,7 @@ def usage():
         Print the usage on the stdout.
     """
     print(
-        "Usage : gallica_fetcher.py -u <url> [-o <output_filename>] [-p <firstPage>[-<lastPage>]]")
+        "Usage : gallica_fetcher -u <url> [-o <output_filename>] [-p <firstPage>[-<lastPage>]]")
     print("Exemples :")
     print("gallica_fetcher.py -u <url> -p 1-12 -o extract")
     print("gallica_fetcher.py -u <url> -p 13")
