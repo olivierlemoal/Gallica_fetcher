@@ -13,6 +13,8 @@ Installation
     pip install pillow
     git clone https://github.com/olivierlemoal/Gallica_fetcher.git
     cd Gallica_fetcher
+    chmod +x setup.py
+    ./setup.py install
 
 Usage
 -----
@@ -45,6 +47,8 @@ Installation
     pip install pillow
     git clone https://github.com/olivierlemoal/Gallica_fetcher.git
     cd Gallica_fetcher
+    chmod +x setup.py
+    ./setup.py install
 
 Utilisation
 -----------
