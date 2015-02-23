@@ -7,10 +7,11 @@ Requirement
 ----------
 - [Pillow](https://pypi.python.org/pypi/Pillow)
 
-Installation
-------------
+Installation (Debian)
+---------------------
 
-    pip install pillow
+    sudo apt-get install libjpeg-dev
+    pip3 install -I pillow
     git clone https://github.com/olivierlemoal/Gallica_fetcher.git
     cd Gallica_fetcher
     chmod +x setup.py
@@ -44,7 +45,8 @@ Dépendance
 Installation
 ------------
 
-    pip install pillow
+    sudo apt-get install libjpeg-dev
+    pip3 install -I pillow
     git clone https://github.com/olivierlemoal/Gallica_fetcher.git
     cd Gallica_fetcher
     chmod +x setup.py
