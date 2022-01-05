@@ -152,7 +152,7 @@ class Gallica:
                    "Mozilla/5.0 (X11; Linux x86_64; rv:24.0) Gecko/20100101 Firefox/24.0"}
         full_url = url + '?' + url_values + "&r=" + \
             "{0},{1},{2},{2}".format(x, y, self.SIZE_TILE)
-        conn = http.client.HTTPConnection(gallica)
+        conn = http.client.HTTPSConnection(gallica)
         conn.request("GET", full_url, "", headers)
         res = conn.getresponse()
         return res
